@@ -1,9 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "FPSEscapeRoomCharacter.h"
-
-#include <string>
-
 #include "FPSEscapeRoomProjectile.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
@@ -16,6 +13,8 @@
 
 //////////////////////////////////////////////////////////////////////////
 // AFPSEscapeRoomCharacter
+
+
 
 AFPSEscapeRoomCharacter::AFPSEscapeRoomCharacter()
 {
@@ -39,12 +38,43 @@ AFPSEscapeRoomCharacter::AFPSEscapeRoomCharacter()
 	Mesh1P->CastShadow = false;
 	Mesh1P->SetRelativeRotation(FRotator(1.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-0.5f, -4.4f, -155.7f));
+
+	SetForwardBreatheModeParameters();
+}
+
+void AFPSEscapeRoomCharacter::SetForwardBreatheModeParameters()
+{
+	if(bForwardMode)
+	{
+		GetCharacterMovement()->AirControl = ForwardAirControl;
+		GetCharacterMovement()->FallingLateralFriction = ForwardFallingFriction;
+	}
+	else
+	{
+		GetCharacterMovement()->AirControl = BreatheAirControl;
+		GetCharacterMovement()->FallingLateralFriction = BreatheFallingFriction;
+	}
 }
 
 void AFPSEscapeRoomCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+}
+
+void AFPSEscapeRoomCharacter::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	FName PropertyName = (PropertyChangedEvent.Property != NULL) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(AFPSEscapeRoomCharacter, bForwardMode))
+	{
+		/* Because you are inside the class, you should see the value already changed */
+			if(GEngine)
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Zmiana!"));
+
+		SetForwardBreatheModeParameters();
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -109,7 +139,7 @@ void AFPSEscapeRoomCharacter::EndTouch(const ETouchIndex::Type FingerIndex, cons
 void AFPSEscapeRoomCharacter::MoveForward(float Value)
 {
 	// add movement in that direction
-	AddMovementInput(GetActorForwardVector(), Value + bForwardMode);
+	AddMovementInput(GetActorForwardVector(), Value + bForwardMode * 2);
 }
 
 void AFPSEscapeRoomCharacter::MoveRight(float Value)
@@ -148,6 +178,9 @@ void AFPSEscapeRoomCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	Bounce(bForwardMode);
+	///////////////////////////////////////////////////////////////////////////// FOR DEBUGGING ONLY
+	if(GetLocalViewingPlayerController()->WasInputKeyJustPressed(EKeys::SpaceBar))
+		bForwardMode = !bForwardMode;
 }
 
 bool AFPSEscapeRoomCharacter::EnableTouchscreenMovement(class UInputComponent* PlayerInputComponent)

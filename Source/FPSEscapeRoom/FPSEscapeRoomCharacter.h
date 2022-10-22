@@ -33,11 +33,15 @@ class AFPSEscapeRoomCharacter : public ACharacter
 	float MinTimeBetweenJumps = 0.f;
 	float TimeSinceLastJumped = 0.f;
 
+	void SetForwardBreatheModeParameters();
+
 public:
 	AFPSEscapeRoomCharacter();
 
 protected:
 	virtual void BeginPlay();
+
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 
 public:
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
@@ -46,6 +50,18 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
 	bool bForwardMode = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
+	float ForwardAirControl = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
+	float ForwardFallingFriction = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
+	float BreatheAirControl = 0.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
+	float BreatheFallingFriction = 0.75f;
 
 	/** Delegate to whom anyone can subscribe to receive this event */
 	UPROPERTY(BlueprintAssignable, Category = "Interaction")
