@@ -23,7 +23,7 @@
 .idea/**/*.iml
 .idea/**/contentModel.xml
 .idea/**/modules.xml
-.idea/.idea.Jumppopper.dir/*
+.idea/.idea.FPSEscapeRoom.dir/*
 
 *.suo
 *.user
@@ -111,4 +111,4 @@ Plugins/Developer/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
-.idea/.idea.Blaster/.idea/vcs.xml
+.idea/.idea.FPSEscapeRoom/.idea/vcs.xml
