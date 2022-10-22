@@ -78,7 +78,7 @@ void UTP_WeaponComponent::AttachWeapon(AFPSEscapeRoomCharacter* TargetCharacter)
 		// Attach the weapon to the First Person Character
 		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 		GetOwner()->AttachToComponent(Character->GetMesh1P(),AttachmentRules, FName(TEXT("GripPoint")));
-
+		Character->GetMesh1P()->SetVisibility(true, true);
 		// Register so that Fire is called every time the character tries to use the item being held
 		Character->OnUseItem.AddDynamic(this, &UTP_WeaponComponent::Fire);
 	}
