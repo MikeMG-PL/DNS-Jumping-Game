@@ -15,7 +15,6 @@
 // AFPSEscapeRoomCharacter
 
 
-
 AFPSEscapeRoomCharacter::AFPSEscapeRoomCharacter()
 {
 	// Set size for collision capsule
@@ -38,30 +37,36 @@ AFPSEscapeRoomCharacter::AFPSEscapeRoomCharacter()
 	Mesh1P->CastShadow = false;
 	Mesh1P->SetRelativeRotation(FRotator(1.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-0.5f, -4.4f, -155.7f));
-
-	SetForwardBreatheModeParameters();
 }
 
-void AFPSEscapeRoomCharacter::SetForwardBreatheModeParameters()
+void AFPSEscapeRoomCharacter::SetForwardBreatheModeParameters(bool Forward)
 {
-	if(bForwardMode)
+	if (Forward)
 	{
 		GetCharacterMovement()->AirControl = ForwardAirControl;
+		GetCharacterMovement()->JumpZVelocity = ForwardJumpHeight;
+		GetCharacterMovement()->MaxWalkSpeed = ForwardSpeed;
 		GetCharacterMovement()->FallingLateralFriction = ForwardFallingFriction;
 	}
 	else
 	{
 		GetCharacterMovement()->AirControl = BreatheAirControl;
+		GetCharacterMovement()->JumpZVelocity = BreatheJumpHeight;
+		GetCharacterMovement()->MaxWalkSpeed = BreatheSpeed;
 		GetCharacterMovement()->FallingLateralFriction = BreatheFallingFriction;
 	}
+
+	bForwardMode = Forward;
 }
 
 void AFPSEscapeRoomCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+	SetForwardBreatheModeParameters(false);
 }
 
+// EDITOR ONLY
 void AFPSEscapeRoomCharacter::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -70,10 +75,10 @@ void AFPSEscapeRoomCharacter::PostEditChangeProperty(FPropertyChangedEvent& Prop
 	if (PropertyName == GET_MEMBER_NAME_CHECKED(AFPSEscapeRoomCharacter, bForwardMode))
 	{
 		/* Because you are inside the class, you should see the value already changed */
-			if(GEngine)
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Zmiana!"));
+		if (GEngine)
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Zmiana!"));
 
-		SetForwardBreatheModeParameters();
+		SetForwardBreatheModeParameters(bForwardMode);
 	}
 }
 
@@ -167,7 +172,7 @@ void AFPSEscapeRoomCharacter::Bounce(bool bForwardModeOn)
 {
 	TimeSinceLastJumped += GetWorld()->GetDeltaSeconds();
 
-	if (GetCharacterMovement()->IsMovingOnGround() && TimeSinceLastJumped >= MinTimeBetweenJumps)
+	if (GetCharacterMovement()->IsMovingOnGround() && TimeSinceLastJumped >= MinTimeBetweenJumps && bForwardMode)
 	{
 		Jump();
 		TimeSinceLastJumped = 0.f;
@@ -179,8 +184,8 @@ void AFPSEscapeRoomCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 	Bounce(bForwardMode);
 	///////////////////////////////////////////////////////////////////////////// FOR DEBUGGING ONLY
-	if(GetLocalViewingPlayerController()->WasInputKeyJustPressed(EKeys::SpaceBar))
-		bForwardMode = !bForwardMode;
+	if (GetLocalViewingPlayerController()->WasInputKeyJustPressed(EKeys::Tab))
+		SetForwardBreatheModeParameters(!bForwardMode);
 }
 
 bool AFPSEscapeRoomCharacter::EnableTouchscreenMovement(class UInputComponent* PlayerInputComponent)
