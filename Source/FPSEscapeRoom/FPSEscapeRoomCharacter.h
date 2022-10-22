@@ -30,6 +30,9 @@ class AFPSEscapeRoomCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
 
+	float MinTimeBetweenJumps = 0.f;
+	float TimeSinceLastJumped = 0.f;
+
 public:
 	AFPSEscapeRoomCharacter();
 
@@ -40,6 +43,9 @@ public:
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Camera)
 	float TurnRateGamepad;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
+	bool bForwardMode = false;
 
 	/** Delegate to whom anyone can subscribe to receive this event */
 	UPROPERTY(BlueprintAssignable, Category = "Interaction")
@@ -67,6 +73,10 @@ protected:
 	 */
 	void LookUpAtRate(float Rate);
 
+	void Bounce(bool bForwardModeOn);
+
+	virtual void Tick(float DeltaSeconds) override;
+	
 	struct TouchData
 	{
 		TouchData() { bIsPressed = false;Location=FVector::ZeroVector;}

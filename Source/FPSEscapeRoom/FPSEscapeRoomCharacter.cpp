@@ -10,6 +10,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/SplineComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/InputSettings.h"
 
 
@@ -107,11 +108,8 @@ void AFPSEscapeRoomCharacter::EndTouch(const ETouchIndex::Type FingerIndex, cons
 
 void AFPSEscapeRoomCharacter::MoveForward(float Value)
 {
-	if (Value != 0.0f)
-	{
-		// add movement in that direction
-		AddMovementInput(GetActorForwardVector(), Value);
-	}
+	// add movement in that direction
+	AddMovementInput(GetActorForwardVector(), Value + bForwardMode);
 }
 
 void AFPSEscapeRoomCharacter::MoveRight(float Value)
@@ -133,6 +131,23 @@ void AFPSEscapeRoomCharacter::LookUpAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerPitchInput(Rate * TurnRateGamepad * GetWorld()->GetDeltaSeconds());
+}
+
+void AFPSEscapeRoomCharacter::Bounce(bool bForwardModeOn)
+{
+	TimeSinceLastJumped += GetWorld()->GetDeltaSeconds();
+
+	if (GetCharacterMovement()->IsMovingOnGround() && TimeSinceLastJumped >= MinTimeBetweenJumps)
+	{
+		Jump();
+		TimeSinceLastJumped = 0.f;
+	}
+}
+
+void AFPSEscapeRoomCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	Bounce(bForwardMode);
 }
 
 bool AFPSEscapeRoomCharacter::EnableTouchscreenMovement(class UInputComponent* PlayerInputComponent)
