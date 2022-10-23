@@ -33,8 +33,6 @@ class AFPSEscapeRoomCharacter : public ACharacter
 	float MinTimeBetweenJumps = 0.f;
 	float TimeSinceLastJumped = 0.f;
 
-	void SetForwardBreatheModeParameters(bool Forward);
-
 public:
 	AFPSEscapeRoomCharacter();
 
@@ -76,6 +74,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
 	float BreatheFallingFriction = 0.75f;
 
+	UFUNCTION(BlueprintCallable)
+	void SetForwardBreatheModeParameters(bool Forward);
+	
 	/** Delegate to whom anyone can subscribe to receive this event */
 	UPROPERTY(BlueprintAssignable, Category = "Interaction")
 	FOnUseItem OnUseItem;
